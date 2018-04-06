@@ -25,6 +25,8 @@
  * DEFINITIONS
  **************************************************************************/
 #define EXIT_SUCCESS				0
+#define TRUE 						1
+#define FALSE						0
 #define MAX_COMMAND_LENGTH			1024
 
 #define PROGRAM_NAME				"execute"
@@ -41,5 +43,7 @@
 void execute_command(int numberInput, char **inputs);
 
 void get_process_status(struct timespec start_time, struct timespec end_time);
+
+int read_input();
 
 #endif

@@ -29,7 +29,6 @@ void execute_command(int numberInput, char **inputs){
   	int status = 0;
   	struct timespec start_time, end_time;
 
-
   	child_pid = fork();
 
   	if ( child_pid == 0 ) {
@@ -37,7 +36,7 @@ void execute_command(int numberInput, char **inputs){
   		/* get start timer*/
   		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
 
-	    execv("/bin/ls", &inputs[1]);
+	    execv("/bin/ls", inputs);
 	    perror("fork child process error condition!" );
   	} else {
   		pid = wait(&child_pid);
@@ -46,12 +45,60 @@ void execute_command(int numberInput, char **inputs){
   	}
 }
 
+int read_input(){
+	char ** res = NULL;
+	char * p = NULL;
+	char pchCommand[MAX_COMMAND_LENGTH];
+	int nTokens = 0;
+
+	printf("Digite um comando: \n");
+	
+	fgets(pchCommand, sizeof(pchCommand), stdin);
+    p = strtok (pchCommand, "\r\n\r\n");
+	p = strtok (pchCommand, " ");
+
+	while (p != NULL) {
+		res = realloc (res, sizeof (char*) * ++nTokens);
+
+		if (res == NULL){
+			perror("Alloc memory failed");
+		}
+
+		res[nTokens-1] = p;
+
+		p = strtok (NULL, " ");
+	}
+
+	res = realloc (res, sizeof (char *) * (++nTokens));
+	res[nTokens-1] = 0;
+
+	for(int i = 0; i < nTokens-1; ++i){
+		char *aux = res[i];
+		if(aux[0] == EOF){
+			return FALSE;
+		}
+		if(strcmp("exit", res[i]) == 0){
+			return FALSE;
+		}
+
+		if(strncmp(res[i], "cd", 2) == 0){
+			char * path = res[i];
+			path += 2;
+			chdir(path);
+		}
+	}
+
+	execute_command(nTokens, res);
+	free(res);
+	return TRUE;
+}
+
 int main(int argc, char **argv) {
 
 	if(argc > 1){
-		execute_command(argc, argv);
+		execute_command(argc, &argv[1]);
 	} else {
-
+		while(read_input());
 	}
 
 	return EXIT_SUCCESS;
