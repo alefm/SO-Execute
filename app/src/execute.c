@@ -89,6 +89,8 @@ int read_input(){
 			char * path = res[i];
 			path += 2;
 			chdir(path);
+			free(res);
+			return TRUE;
 		}
 
 		if(strcmp("&", res[i]) == 0){
