@@ -23,7 +23,7 @@ void get_process_status(struct timespec start_time, struct timespec end_time){
 	printf("* Numero de vezes que o processo foi interrompido voluntariamente: %ld\n", usage.ru_nvcsw);
 }
 
-void execute_command(int numberInput, char **inputs){
+void execute_command(int numberInput, char **inputs, int bBackground){
 	pid_t child_pid;
   	pid_t pid;
   	int status = 0;
@@ -36,10 +36,13 @@ void execute_command(int numberInput, char **inputs){
   		/* get start timer*/
   		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
 
-	    execv("/bin/ls", inputs);
+	    execvp(inputs[0], inputs);
 	    perror("fork child process error condition!" );
   	} else {
-  		pid = wait(&child_pid);
+  		
+  		if(!bBackground){
+  			pid = wait(&child_pid);
+  		}
   		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
   		get_process_status(start_time, end_time);
   	}
@@ -50,6 +53,7 @@ int read_input(){
 	char * p = NULL;
 	char pchCommand[MAX_COMMAND_LENGTH];
 	int nTokens = 0;
+	int bBackground = FALSE;
 
 	printf("Digite um comando: \n");
 	
@@ -86,9 +90,14 @@ int read_input(){
 			path += 2;
 			chdir(path);
 		}
+
+		if(strcmp("&", res[i]) == 0){
+			bBackground = TRUE;
+		}
+
 	}
 
-	execute_command(nTokens, res);
+	execute_command(nTokens, res, bBackground);
 	free(res);
 	return TRUE;
 }
@@ -96,7 +105,7 @@ int read_input(){
 int main(int argc, char **argv) {
 
 	if(argc > 1){
-		execute_command(argc, &argv[1]);
+		execute_command(argc, &argv[1], FALSE);
 	} else {
 		while(read_input());
 	}

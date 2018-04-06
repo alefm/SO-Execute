@@ -40,7 +40,7 @@
  **************************************************************************/
 
 /* Metodo responsável por executar um comando */
-void execute_command(int numberInput, char **inputs);
+void execute_command(int numberInput, char **inputs, int bBackground);
 
 void get_process_status(struct timespec start_time, struct timespec end_time);
 
