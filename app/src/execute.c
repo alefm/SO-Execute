@@ -34,7 +34,7 @@ void execute_command(int numberInput, char **inputs, int bBackground){
   	if ( child_pid == 0 ) {
 
   		/* get start timer*/
-  		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
+  		clock_gettime(CLOCK_REALTIME, &start_time);
 
 	    execvp(inputs[0], inputs);
 	    perror("fork child process error condition!" );
@@ -43,7 +43,7 @@ void execute_command(int numberInput, char **inputs, int bBackground){
   		if(!bBackground){
   			pid = wait(&child_pid);
   		}
-  		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
+  		clock_gettime(CLOCK_REALTIME, &end_time);
   		get_process_status(start_time, end_time);
   	}
 }
